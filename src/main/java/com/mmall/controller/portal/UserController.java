@@ -1,9 +1,11 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Const;
+import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.MD5Util;
 import net.sf.jsqlparser.schema.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -63,6 +65,12 @@ public class UserController {
         return iUserService.register(user);
     }
 
+    /**
+     * 检查用户名或者邮箱是否能使用；
+     * @param str
+     * @param type
+     * @return
+     */
     @RequestMapping(value = "check_valid.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> checkValid (String str, String type) {
@@ -85,9 +93,38 @@ public class UserController {
         return iUserService.selectQuestion(username);
     }
 
+    /**
+     * 输入用户名及问题和答案，获取token；
+     * @param username
+     * @param question
+     * @param answer
+     * @return
+     */
     @RequestMapping(value = "forget_check_answer.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer) {
-        return iUserService.selectQuestion(username);
+        return iUserService.checkAnswer(username,question,answer);
     }
+
+
+    @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        return iUserService.forgetResetPassword(username,passwordNew,forgetToken);
+    }
+
+    @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录");
+        }
+        return iUserService.resetPassword(passwordOld,passwordNew,user);
+    }
+
+
+
+
+
 }

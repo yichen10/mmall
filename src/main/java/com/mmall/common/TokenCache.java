@@ -5,7 +5,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.org.mozilla.javascript.internal.EcmaError;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by wang on 2018/3/18.
@@ -13,8 +14,11 @@ import sun.org.mozilla.javascript.internal.EcmaError;
 public class TokenCache {
     private static Logger logger = LoggerFactory.getLogger(TokenCache.class);
 
-    private static LoadingCache<String, String> loadingCache = CacheBuilder.newBuilder().initialCapacity(1000).maximumSize(10000).
-            build(new CacheLoader<String, String>() {
+    public static final String TOKEN_PREFIX = "token_";
+
+    private static LoadingCache<String, String> loadingCache = CacheBuilder.newBuilder().initialCapacity(1000).maximumSize(10000)
+            .expireAfterAccess(12, TimeUnit.HOURS)
+            .build(new CacheLoader<String, String>() {
                 @Override
                 public String load(String s) throws Exception {
                     return "null";
