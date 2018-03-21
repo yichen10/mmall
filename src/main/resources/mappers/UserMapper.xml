@@ -197,4 +197,11 @@
     set password = #{password}
     where id = #{userId}
   </update>
+
+  <select id="updateInfoCheckEmail" parameterType="map" resultType="int" >
+    SELECT count(1)
+    from mmall_user
+    where id != #{userId}
+    and email = #{email}
+  </select>
 </mapper>
