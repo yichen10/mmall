@@ -47,7 +47,7 @@ public class CategoryManageController {
 
     @RequestMapping(value = "add_category.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse addCategory(HttpSession session,String categoryName, @RequestParam(value = "categoryId",defaultValue = "0") Integer parentId) {
+    public ServerResponse addCategory(HttpSession session,String categoryName, @RequestParam(value = "parentId",defaultValue = "0") Integer parentId) {
         User user = (User)session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCode(ResponseCode.NEED_LOGIN.getCode(),"用户未登录");
@@ -58,8 +58,39 @@ public class CategoryManageController {
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
+   }
 
+    @RequestMapping(value = "get_deep_category.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse getDeepCategory(HttpSession session, @RequestParam(value = "categoryId",defaultValue = "0") Integer categoryId) {
+        User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCode(ResponseCode.NEED_LOGIN.getCode(),"用户未登录");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()) {
+            //业务逻辑
+            return iCategoryService.getDeepCategoryById(categoryId);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
     }
+
+
+    @RequestMapping(value = "set_category_name.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse updateCategoryName(HttpSession session,String categoryName, @RequestParam(value = "categoryId",defaultValue = "0") Integer categoryId) {
+        User user = (User)session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCode(ResponseCode.NEED_LOGIN.getCode(),"用户未登录");
+        }
+        if (iUserService.checkAdminRole(user).isSuccess()) {
+            //业务逻辑
+            return iCategoryService.updateCategoryName(categoryName, categoryId);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+
 
 
 
